@@ -55,12 +55,14 @@ int main() {
     double AVG = 0;
     int N = 10;  // number of trials
     double total_time[N];
-   int j;
-   struct complex c;
+   int j;//initalizing j  because each thread in the parallel region gets its own local copy of that variable and it’s declared as private.  
+   struct complex c; // similarly for c, we initalize complex number c,and it is declared as private. 
     // Parallelize the trials loop
     for (int k = 0; k < N; k++) {
         clock_t start_time = clock();  // Start measuring time
+	    // Each thread gets its own private copies of 'j' and 'c' to avoid data races, and the 'AVG' variable is reduced safely across threads.
 	 #pragma omp parallel for schedule(dynamic) private(j,c) reduction(+:AVG)
+	    // Parallelize the for loop with dynamic scheduling, ensuring work is distributed in chunks to threads at runtime.
 	for (int i = 0; i < HEIGHT; i++) {
     		for (int j = 0; j < WIDTH; j++) {
        			 c.real = (j - WIDTH / 2.0) * 4.0 / WIDTH;
